@@ -23,8 +23,19 @@ const listaBrancaContatos = [
     '5513997862006@c.us',
     '147188680233206@lid',
     '12949410308211@lid',
-    '7086779932822@lid'
+    '7086779932822@lid',
+    '246681815748624@lid',
+    '143194276810867@lid',
+    '169921875058835@lid'
 ];
+
+// client.on('message_create', async (msg) => {
+//     console.log('===============');
+//     console.log(msg.body);
+//     console.log(msg.author);
+//     console.log(msg.from);
+//     console.log('===============');
+// });
 
 client.on('message_create', async (msg) => {
     // --- 1. OTIMIZAÇÃO: FILTRO DE COMANDO NO TOPO ---
@@ -41,7 +52,7 @@ client.on('message_create', async (msg) => {
     // --- 2. SEGURANÇA: FILTRO DE PESSOAS ---
     // Em grupos, quem enviou está em 'msg.author'. No privado, está em 'msg.from'.
     const remetenteBruto = msg.from.endsWith('@g.us') ? msg.author : msg.from;
-    
+
     // Extrai o ID limpo (trata variações de objetos da biblioteca)
     const autorId = typeof remetenteBruto === 'object' ? remetenteBruto._serialized : remetenteBruto;
 
@@ -53,26 +64,32 @@ client.on('message_create', async (msg) => {
 
     // --- 3. PROCESSAMENTO E ENVIO DA FIGURINHA ---
     try {
-        console.log(`Comando aceito de ${autorId}! Iniciando criação...`);
-
-        // Correção do erro "r: r" do WhatsApp Web
-        if (msg.id && !msg.id._serialized && msg.id.$1) { 
-            msg.id._serialized = msg.id.$1; 
+        // 1. CORREÇÃO DO ERRO r: r NO OBJETO DA MENSAGEM
+        if (msg.id && !msg.id._serialized && msg.id.$1) {
+            msg.id._serialized = msg.id.$1;
         }
 
+        // 2. ROTEAMENTO SEGURO DE DESTINO (Resolve o bug do envio privado)
+        let destinoEnvio;
+
+        if (msg.fromMe) {
+            // Se a mensagem foi enviada por VOCÊ no grupo, o destino real está em msg.to
+            destinoEnvio = msg.to;
+        } else {
+            // Se a mensagem veio de outra pessoa, o destino real está em msg.from
+            destinoEnvio = msg.from;
+        }
+
+        console.log('Baixando mídia...');
         const media = await msg.downloadMedia();
         if (!media) {
             console.log('Erro: Falha ao baixar o arquivo de mídia.');
             return;
         }
 
-        // --- CORREÇÃO DE ENVIO PARA GRUPOS ---
-        // Garante que o ID do grupo seja extraído corretamente sem caracteres ocultos
-        const destinoEnvio = msg.from.endsWith('@g.us') ? msg.from : msg.to;
+        console.log(`Enviando figurinha diretamente para o chat correto: ${destinoEnvio}`);
 
-        console.log(`Enviando figurinha para o destino: ${destinoEnvio}`);
-        
-        // Envia explicitamente para o ID correto da conversa
+        // 3. ENVIA USANDO O ID REDIRECIONADO
         await client.sendMessage(destinoEnvio, media, { sendMediaAsSticker: true });
         console.log('Figurinha enviada com sucesso!');
 
@@ -80,3 +97,25 @@ client.on('message_create', async (msg) => {
         console.error('Erro no processamento da figurinha:', error);
     }
 });
+
+// Evento que escuta reações em mensagens (ex: quando alguém coloca um emoji)
+// client.on('message_reaction', async (reaction) => {
+//     try {
+//         console.log('\n--- MENSAGEM FAVORITADA VIA REAÇÃO ---');
+
+//             // 1. Captura quem enviou a mensagem original que recebeu a estrela
+//             // Em grupos, usamos reaction.senderId (quem enviou a msg reagida)
+//             const autorOriginalBruto = reaction.msgId.participant || reaction.msgId.remote;
+            
+//             // 2. Garante a extração limpa da string do identificador (@lid ou @c.us)
+//             const numeroEmbaralhado = typeof autorOriginalBruto === 'object' 
+//                 ? autorOriginalBruto._serialized 
+//                 : autorOriginalBruto;
+
+//             console.log(`Usuário original da mensagem: ${numeroEmbaralhado}`);
+//             console.log(`Quem reagiu com a estrela: ${reaction.senderId}`);
+//             console.log('---------------------------------------\n');
+//     } catch (error) {
+//         console.error('Erro ao ler reação da mensagem:', error);
+//     }
+// });
