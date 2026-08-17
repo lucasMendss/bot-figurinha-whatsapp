@@ -3,7 +3,7 @@ whatsapp-web.js documentation:
 - https://wwebjs.dev/
 - https://docs.wwebjs.dev/index.html
 */
-
+require('dotenv').config();
 const { Client } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 
@@ -19,23 +19,7 @@ client.on('qr', qr => {
 
 client.initialize();
 
-const listaBrancaContatos = [
-    '5513997862006@c.us',
-    '147188680233206@lid',
-    '12949410308211@lid',
-    '7086779932822@lid',
-    '246681815748624@lid',
-    '143194276810867@lid',
-    '169921875058835@lid'
-];
-
-// client.on('message_create', async (msg) => {
-//     console.log('===============');
-//     console.log(msg.body);
-//     console.log(msg.author);
-//     console.log(msg.from);
-//     console.log('===============');
-// });
+const listaBrancaContatos = process.env.LISTA_BRANCA_CONTATOS.split(',');
 
 client.on('message_create', async (msg) => {
     // --- 1. OTIMIZAÇÃO: FILTRO DE COMANDO NO TOPO ---
@@ -98,7 +82,7 @@ client.on('message_create', async (msg) => {
     }
 });
 
-// Evento que escuta reações em mensagens (ex: quando alguém coloca um emoji)
+// evento que escuta reações em mensagens (ex: quando alguém coloca um emoji)
 // client.on('message_reaction', async (reaction) => {
 //     try {
 //         console.log('\n--- MENSAGEM FAVORITADA VIA REAÇÃO ---');
@@ -118,4 +102,12 @@ client.on('message_create', async (msg) => {
 //     } catch (error) {
 //         console.error('Erro ao ler reação da mensagem:', error);
 //     }
+// });
+
+// client.on('message_create', async (msg) => {
+//     console.log('===============');
+//     console.log(msg.body);
+//     console.log(msg.author);
+//     console.log(msg.from);
+//     console.log('===============');
 // });
