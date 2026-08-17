@@ -7,17 +7,7 @@ require('dotenv').config();
 const { Client } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 
-//const client = new Client();
-
-const client = new Client({
-    puppeteer: {
-        executablePath: '/data/data/com.termux/files/usr/bin/chromium-browser',
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox'
-        ]
-    }
-});
+const client = new Client();
 
 client.on('ready', () => {
     console.log('Client is ready!');
