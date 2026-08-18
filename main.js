@@ -3,11 +3,28 @@ whatsapp-web.js documentation:
 - https://wwebjs.dev/
 - https://docs.wwebjs.dev/index.html
 */
+
 require('dotenv').config();
 const { Client } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 
-const client = new Client();
+const isTermux = process.env.TERMUX_VERSION !== undefined;
+
+const puppeteerConfig = {
+    args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox'
+    ]
+};
+
+if (isTermux) {
+    puppeteerConfig.executablePath =
+        '/data/data/com.termux/files/usr/bin/chromium-browser';
+}
+
+const client = new Client({
+    puppeteer: puppeteerConfig
+});
 
 client.on('ready', () => {
     console.log('Client is ready!');
@@ -42,7 +59,7 @@ client.on('message_create', async (msg) => {
 
     // Se a pessoa não estiver cadastrada na lista branca, o bot ignora o pedido
     if (!listaBrancaContatos.includes(autorId)) {
-        console.log(`Comando bloqueado. Usuário não autorizado: ${autorId}`);
+        console.log(`Processo interrompido. Usuário não autorizado: ${autorId}`);
         return;
     }
 
@@ -71,7 +88,7 @@ client.on('message_create', async (msg) => {
             return;
         }
 
-        console.log(`Enviando figurinha diretamente para o chat correto: ${destinoEnvio}`);
+        console.log(`Enviando figurinha para o chat: ${destinoEnvio}`);
 
         // 3. ENVIA USANDO O ID REDIRECIONADO
         await client.sendMessage(destinoEnvio, media, { sendMediaAsSticker: true });
