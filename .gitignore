@@ -1,5 +1,6 @@
 .wwebjs_cache/
 .wwebjs_auth/
+/auth_info_baileys
 node_modules/
 plan.txt
 .env
