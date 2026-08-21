@@ -51,7 +51,7 @@ async function conectarWhatsApp() {
 
         // Conexão estabelecida
         else if (connection === 'open') {
-            await sock.sendPresenceUpdate('unavailable')
+            sock.sendPresenceUpdate('unavailable')
             console.log('Client is ready!');
         }
     });
