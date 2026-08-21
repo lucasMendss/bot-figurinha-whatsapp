@@ -58,32 +58,6 @@ async function conectarWhatsApp() {
     // Salva as credenciais sempre que forem atualizadas
     sock.ev.on('creds.update', saveCreds);
 
-    // EVENTO DE REAÇÕES PARA IDENTIFICAR JID
-    sock.ev.on('messages.reaction', (reactions) => {
-        for (const reaction of reactions) {
-            const remoteJid = reaction.key.remoteJid;
-            const isGroup = remoteJid.endsWith('@g.us');
-
-            // 1) JID da pessoa dona da mensagem reagida
-            const originalJid = isGroup
-                ? reaction.key.participant
-                : reaction.key.remoteJid;
-
-            // 2) JID de quem reagiu
-            const reactorJid = isGroup
-                ? reaction.reaction.key?.participant
-                : reaction.reaction.key?.remoteJid;
-
-            // 3) emoji ou "removida"
-            const emoji = reaction.reaction.text || 'removida';
-
-            console.log('--- Nova reação ---');
-            console.log('JID da mensagem original:', originalJid);
-            console.log('JID de quem reagiu:', reactorJid);
-            console.log('Emoji:', emoji);
-        }
-    });
-
     // RECEBIMENTO DE MENSAGENS
     sock.ev.on('messages.upsert', async ({ messages, type }) => {
         for (const msg of messages) {
@@ -99,14 +73,6 @@ async function conectarWhatsApp() {
                 .filter(Boolean)
 
             if (!contatosPermitidos.includes(senderJid)) continue
-
-            console.log("========================================")
-            console.log('--- upsert de contato autorizado recebido ---')
-            console.log('type:', type)
-            console.log('key:', msg.key)
-            console.log('message existe?', !!msg.message)
-            console.log('messageStubType:', msg.messageStubType)
-            console.log("========================================")
 
             const messageType = Object.keys(msg.message)[0]
             const isImage = messageType === 'imageMessage'

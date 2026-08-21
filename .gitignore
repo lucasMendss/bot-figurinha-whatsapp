@@ -1,7 +1,4 @@
-.wwebjs_cache/
-.wwebjs_auth/
-/auth_info_baileys
+auth_info_baileys/
 node_modules/
-plan.txt
+utils.txt
 .env
-test.js
