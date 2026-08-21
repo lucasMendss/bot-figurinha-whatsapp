@@ -10,14 +10,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// 1. CONFIGURAÇÃO
-const contatosPermitidos =
-    process.env.CONTATOS_PERMITIDOS
-        ? process.env.CONTATOS_PERMITIDOS.split(',')
-        : [];
-
-
-// 2. CONEXÃO COM O WHATSAPP
 async function conectarWhatsApp() {
 
     const { state, saveCreds } =
@@ -28,7 +20,7 @@ async function conectarWhatsApp() {
         shouldSyncHistoryMessage: () => false
     });
 
-    // 3. QR CODE E ESTADO DA CONEXÃO
+    // QR CODE E ESTADO DA CONEXÃO
     sock.ev.on('connection.update', (update) => {
 
         const { connection, lastDisconnect, qr } = update;
@@ -72,12 +64,12 @@ async function conectarWhatsApp() {
             const remoteJid = reaction.key.remoteJid;
             const isGroup = remoteJid.endsWith('@g.us');
 
-            // 1) JID da pessoa dona da mensagem original (nunca o ID do grupo)
+            // 1) JID da pessoa dona da mensagem reagida
             const originalJid = isGroup
                 ? reaction.key.participant
                 : reaction.key.remoteJid;
 
-            // 2) JID de quem reagiu (nunca o ID do grupo)
+            // 2) JID de quem reagiu
             const reactorJid = isGroup
                 ? reaction.reaction.key?.participant
                 : reaction.reaction.key?.remoteJid;
@@ -92,7 +84,7 @@ async function conectarWhatsApp() {
         }
     });
 
-    // 4. RECEBIMENTO DE MENSAGENS
+    // RECEBIMENTO DE MENSAGENS
     sock.ev.on('messages.upsert', async ({ messages, type }) => {
         for (const msg of messages) {
             if (!msg.message) continue
@@ -150,7 +142,6 @@ async function conectarWhatsApp() {
             }
         }
     })
-
 }
 
 conectarWhatsApp();
