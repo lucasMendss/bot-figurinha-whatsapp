@@ -17,10 +17,11 @@ async function conectarWhatsApp() {
 
     const sock = makeWASocket({
         auth: state,
+        markOnlineOnConnect: false,
         shouldSyncHistoryMessage: () => false
     });
 
-    // QR CODE E ESTADO DA CONEXÃO
+    // QR Code e estado da conexão
     sock.ev.on('connection.update', (update) => {
 
         const { connection, lastDisconnect, qr } = update;
@@ -46,11 +47,11 @@ async function conectarWhatsApp() {
             if (shouldReconnect) {
                 conectarWhatsApp();
             }
-
         }
 
         // Conexão estabelecida
         else if (connection === 'open') {
+            await sock.sendPresenceUpdate('unavailable')
             console.log('Client is ready!');
         }
     });
@@ -86,11 +87,12 @@ async function conectarWhatsApp() {
 
             if (caption?.trim() !== '!sticker') continue
 
+            // Enviar figruinha
             try {
                 const buffer = await downloadMediaMessage(msg, 'buffer', {})
 
                 const sticker = new Sticker(buffer, {
-                    pack: 'Meu Bot',
+                    pack: 'Bot',
                     author: 'Baileys',
                     type: StickerTypes.FULL,
                     quality: 70
@@ -99,8 +101,7 @@ async function conectarWhatsApp() {
                 const stickerBuffer = await sticker.toBuffer()
 
                 console.log("========================================")
-                console.log("enviando para " + remoteJid);
-                console.log("participante do grupo: " + msg.key.participant);
+                console.log("Enviando figurinha para " + remoteJid);
                 console.log("========================================")
                 await sock.sendMessage(remoteJid, { sticker: stickerBuffer })
             } catch (err) {
