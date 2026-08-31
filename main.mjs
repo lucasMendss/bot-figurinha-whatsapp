@@ -43,7 +43,7 @@ async function connectToWhatsApp() {
 
             console.log(
                 'Conexão fechada por', lastDisconnect?.error,
-                ', Reconcetando', shouldReconnect)
+                ', Reconectando', shouldReconnect)
 
             if (shouldReconnect) {
                 connectToWhatsApp()
