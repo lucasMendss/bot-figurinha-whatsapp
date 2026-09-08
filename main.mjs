@@ -25,10 +25,9 @@ async function connectToWhatsApp() {
         markOnlineOnConnect: false
     })
 
-
     // QR Code e estado da conexão
     let conexaoAberta = false
-    sock.ev.on('connection.update', (update) => {
+    sock.ev.on('connection.update', async (update) => { 
         const { connection, lastDisconnect, qr } = update
 
         // Mostra QR Code no terminal
@@ -43,7 +42,7 @@ async function connectToWhatsApp() {
 
             console.log(
                 'Conexão fechada por', lastDisconnect?.error,
-                ', Reconectando', shouldReconnect)
+                ', Reconectando: ', shouldReconnect)
 
             if (shouldReconnect) {
                 connectToWhatsApp()
@@ -52,10 +51,16 @@ async function connectToWhatsApp() {
             }
 
         } else if (connection === 'open') {
-            sock.sendPresenceUpdate('unavailable')
             conexaoAberta = true
             console.log('Conexão estabelecida')
             console.log('Modo de acesso:', MODO_RESTRITO ? 'restrito' : 'aberto')
+
+            try {
+                await sock.sendPresenceUpdate('unavailable')
+                console.log('Status definido como Offline.')
+            } catch (err) {
+                console.error('Erro ao definir status offline:', err)
+            }
         }
     })
 
@@ -111,6 +116,9 @@ async function connectToWhatsApp() {
                 ].join('\n')
 
                 await sock.sendMessage(remoteJid, { text: resposta }, { quoted: msg })
+
+                // Força o offline após responder o comando !jid
+                await sock.sendPresenceUpdate('unavailable')
                 continue
             }
 
@@ -162,11 +170,15 @@ async function connectToWhatsApp() {
                 })
 
                 console.log('Figurinha enviada para', remoteJid)
+
+                // Força o offline após enviar a figurinha
+                await sock.sendPresenceUpdate('unavailable')
+
             } catch (err) {
                 console.error('Erro ao criar figurinha:', err)
             }
         }
-    })  
+    })
 }
 
 connectToWhatsApp()
