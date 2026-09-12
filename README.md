@@ -1,6 +1,6 @@
 # Bot de figurinhas do Whatsapp
 
-Um bot simples para WhatsApp que transforma imagens e GIFs em figurinhas usando o comando !sticker. Ele funciona em conversas individuais e grupos, possui controle de contatos autorizados e mantém a conexão salva para facilitar o uso contínuo.
+Bot para WhatsApp que transforma imagens e GIFs em figurinhas usando o comando "!sticker". Ele funciona em conversas individuais e grupos, possui controle de contatos autorizados e mantém a conexão salva para facilitar o uso contínuo.
 
 ## Instalação e utilização
 
@@ -60,7 +60,7 @@ Descubra seu próprio JID enviando `!jid` em um chat também.
 
 ## Execução do bot no celular com Termux
 
-A versão principal deste bot é focada em execução para PC. Mas, se você tiver um celular sobrando, pode usar ele como servidor do bot. Para rodar o bot no celular, use o app Termux. No terminal do app, rode os comandos abaixo:
+A versão principal deste bot é focada em execução para PC. Mas, se você tiver um celular sobrando, ele pode servir como servidor do bot. Para rodar o bot no celular, use o app Termux. No terminal do app, rode os comandos abaixo:
 
 ```bash
 pkg update && pkg upgrade
